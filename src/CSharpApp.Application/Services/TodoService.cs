@@ -17,7 +17,11 @@ public class TodoService : ITodoService
 
     public async Task<TodoRecord?> GetTodoById(int id)
     {
-        _client.BaseAddress = new Uri(_baseUrl!);
+        //_client.BaseAddress = new Uri(_baseUrl!);
+         if (_client.BaseAddress == null)
+         {
+             _client.BaseAddress = new Uri(_baseUrl);
+         }
         var response = await _client.GetFromJsonAsync<TodoRecord>($"todos/{id}");
 
         return response;
@@ -25,7 +29,11 @@ public class TodoService : ITodoService
 
     public async Task<ReadOnlyCollection<TodoRecord>> GetAllTodos()
     {
-        _client.BaseAddress = new Uri(_baseUrl!);
+        //_client.BaseAddress = new Uri(_baseUrl!);
+         if (_client.BaseAddress == null)
+         {
+             _client.BaseAddress = new Uri(_baseUrl);
+         }
         var response = await _client.GetFromJsonAsync<List<TodoRecord>>($"todos");
 
         return response!.AsReadOnly();
