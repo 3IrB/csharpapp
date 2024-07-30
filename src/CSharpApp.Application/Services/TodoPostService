@@ -1,0 +1,126 @@
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
+using Newtonsoft.Json;
+
+
+namespace CSharpApp.Application.Services;
+
+public class TodoPostService : ITodoPostService
+{
+    //private readonly TodoDbContext _context;
+    private readonly ILogger<TodoService> _logger;
+    private readonly HttpClient _client;
+
+    private readonly string? _baseUrl;
+
+    public TodoPostService(ILogger<TodoService> logger, 
+        IConfiguration configuration)
+    {
+        _logger = logger;
+        _client = new HttpClient();
+        _baseUrl = configuration["BaseUrl"];
+        //_context = ContextBoundObject;
+    }
+    // created to test wheather the posts list is different
+    public async Task<TodoRecord?> GetTodoById(int id)
+    {
+        
+
+        //_client.BaseAddress = new Uri(_baseUrl!);
+        //var baseisnull = _baseUrl!;
+
+        if (_client.BaseAddress == null)
+        {
+            _client.BaseAddress = new Uri(_baseUrl + "posts/");
+        }
+        var response = await _client.GetFromJsonAsync<TodoRecord>($"todos/{id}");
+
+        return response;
+    }
+ 
+    public async Task<ReadOnlyCollection<TodoRecord>> GetAllTodos()
+    {
+       // _client.BaseAddress = new Uri(_baseUrl!);
+       // var baseisnull = _baseUrl!;
+
+        if (_client.BaseAddress == null)
+        {
+            _client.BaseAddress = new Uri(_baseUrl + "posts/");
+        }
+        var response = await _client.GetFromJsonAsync<List<TodoRecord>>($"todos");
+
+        return response!.AsReadOnly();
+    }
+
+// response 200 with message created but no get method returns the new id 
+    public async Task<TodoRecord> postTodo(TodoRecord todo)
+    {
+          if (_client.BaseAddress == null)
+            {
+                _client.BaseAddress = new Uri(_baseUrl + "posts/");
+            }
+           
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _client.BaseAddress);
+
+            string json = JsonConvert.SerializeObject(todo);
+
+            request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+           // var dataJson = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpClient http = new HttpClient();
+            HttpResponseMessage res = await http.PostAsync(_client.BaseAddress, new StringContent( json, Encoding.UTF8, "application/json"));
+
+            if (res.IsSuccessStatusCode)
+            {
+                return todo;
+            }
+            else
+            {
+                return null;
+            }
+        
+
+      
+    }
+  //No matter what the response is 500 
+    public async Task<String> deleteTodoById(int id)
+    {
+        var exists = GetTodoById(id);
+
+        if (true)
+        {
+            if (_client.BaseAddress == null)
+            {
+                _client.BaseAddress = new Uri(_baseUrl );
+
+
+            }
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = _client.BaseAddress,
+                Content = new StringContent(id.ToString(), Encoding.UTF8, "application/json")
+            };
+            var response = await _client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return id.ToString();
+            }
+            else
+            {
+                return null;
+            }
+            
+
+            return response.RequestMessage.ToString(); //!.AsReadOnly();
+
+           
+        }
+        return null;
+        //return TypedResults.NotFound();
+    }
+}
