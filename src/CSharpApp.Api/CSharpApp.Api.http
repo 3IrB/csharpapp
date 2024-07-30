@@ -9,3 +9,21 @@ GET {{CSharpApp.Api_HostAddress}}/todos/1
 Accept: application/json
 
 ###
+
+# POST {{CSharpApp.Api_HostAddress}}/post/todorecord
+# Accept: application/json
+
+# ###
+
+# DELETE {{CSharpApp.Api_HostAddress}}/post/1
+# Accept: application/json
+
+
+# DELETE {{CSharpApp.Api_HostAddress}}/posts/{id}
+# Accept: application/json
+
+# ###
+
+POST {{CSharpApp.Api_HostAddress}}/posts/{TodoRecord}
+Accept: application/json
+###
